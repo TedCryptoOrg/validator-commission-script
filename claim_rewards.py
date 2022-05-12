@@ -124,28 +124,47 @@ print('Waiting for it to be accepted...')
 
 time.sleep(10)
 
+attempts = 0
 balance = get_wallet_balance(restake_wallet_address)
+while attempts < 3 and original_validator_balance == balance:
+    print('Validator balance was not updated... trying again in 10 seconds...')
+    time.sleep(10)
+    balance = get_wallet_balance(restake_wallet_address)
+    attempts += 1
+
 if original_validator_balance == balance:
     print('Validator balance was not updated. Commission probably wasn\'t accepted? Please check TX', command_result)
     exit(1)
 
-print(' -- Claim Successful -- ')
+print(' -- Claim Successful -- \n')
+
+print(' -- Stake and Send -- ')
 
 balance -= 1000000
 restake_amount = balance*restake_wallet_percentage/100
 external_amount = balance*external_wallet_percentage/100
 
-print('Your workable (balance - 1token for fees) is ' + str(balance))
+print('Your workable (balance - 1token for fees) is ' + str(balance) + denom)
 
 if restake_amount > 0.001:
     print('You possible restake amount is ' + str(restake_amount) + denom)
 if external_amount > 0.001:
     print('Your possible external amount is ' + str(external_amount) + denom)
 
-if restake_amount < restake_min_balance or external_amount < external_min_balance:
+if (0.001 < restake_amount < restake_min_balance) or (0.001 < external_amount < external_min_balance):
     print('Minimums are not. Min restake balance is set to ' + str(restake_min_balance) + ' and external min balance is set to ' + str(external_min_balance))
     exit(0)
 
-stake(restake_amount, 2500)
-time.sleep(10)
-send_token(external_amount, 2500)
+if restake_amount > 0.001:
+    print('Staking ' + str(restake_amount) + denom + ' please wait...')
+    command_result = stake(restake_amount, 2500)
+    print(get_mintscan_url(command_result['txhash']))
+    time.sleep(10)
+
+if external_amount > 0.001:
+    print('Sending ' + str(external_amount) + denom + ' to external wallet please wait...')
+    command_result = send_token(external_amount, 2500)
+    print(get_mintscan_url(command_result['txhash']))
+    time.sleep(10)
+
+print(' -- Stake and Send Completed -- \n')
