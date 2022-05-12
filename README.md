@@ -35,3 +35,8 @@ EXTERNAL_WALLET_PERCENTAGE -- Percentage of comission you want to move out (0 - 
 
 Special conditions:
  - If the min balance is not met for restake or external move then no stake and external will be done
+
+## Example of script working
+
+![image](https://user-images.githubusercontent.com/3440849/168132499-76d0f917-9352-4deb-b324-280a1e02e6da.png)
+
