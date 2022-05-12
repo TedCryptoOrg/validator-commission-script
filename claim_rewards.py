@@ -24,7 +24,12 @@ external_min_balance = float(os.environ.get('EXTERNAL_MIN_BALANCE'))
 external_wallet_address = os.environ.get('EXTERNAL_WALLET_ADDRESS')
 external_wallet_percentage = float(os.environ.get('EXTERNAL_WALLET_PERCENTAGE'))
 
-print('===== Running script =======')
+print('===== Running script =======\n')
+
+total_percentage = restake_wallet_percentage + external_wallet_percentage
+if total_percentage > 100:
+    print('Restake and withdraw cannot be bigger than 100%!')
+    exit(1)
 
 
 # GET MINTSCAN TX URL
@@ -113,7 +118,7 @@ def send_token(amount, gas_fees):
 
 original_validator_balance = get_wallet_balance(restake_wallet_address)
 
-print("Validator balance:" + str(original_validator_balance))
+print("Validator balance:" + str(original_validator_balance) + '\n\n')
 
 print(' -- Claim Rewards -- ')
 command_result = claim_rewards(2500)
