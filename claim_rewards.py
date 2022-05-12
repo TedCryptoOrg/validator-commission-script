@@ -76,7 +76,7 @@ def run_command(command):
 # CLAIM REWARDS
 def claim_rewards(gas_fees):
     command = 'echo -e "' + keyring_password + "\n" + keyring_password + '\n" | ' \
-              + binary + ' tx distribution withdraw-rewards ' + restake_wallet_address \
+              + binary + ' tx distribution withdraw-rewards ' + validator \
               + ' --chain-id ' + chain_id \
               + ' --node ' + node \
               + ' --from ' + keyring_wallet_name \
