@@ -89,7 +89,7 @@ def claim_rewards(gas_fees):
 # STAKE FUNCTION
 def stake(stake_balance, gas_fees):
     command = 'echo -e "' + keyring_password + "\n" + keyring_password + '\n" | ' \
-              + binary + ' tx staking delegate ' + validator + ' ' + stake_balance + denom \
+              + binary + ' tx staking delegate ' + validator + ' ' + str(stake_balance) + denom \
               + ' --chain-id ' + chain_id \
               + ' --node ' + node \
               + ' --from ' + keyring_wallet_name \
@@ -101,7 +101,7 @@ def stake(stake_balance, gas_fees):
 # Send tokens between wallets
 def send_token(amount, gas_fees):
     command = 'echo -e "' + keyring_password + "\n" + keyring_password + '\n" | ' \
-              + binary + ' tx bank send ' + restake_wallet_address + ' ' + str(amount) \
+              + binary + ' tx bank send ' + restake_wallet_address + ' ' + external_wallet_address \
               + ' ' + str(amount) + denom \
               + ' --chain-id ' + chain_id \
               + ' --node ' + node \
