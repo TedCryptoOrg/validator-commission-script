@@ -30,7 +30,7 @@ def get_mintscan_url(tx):
 
 
 # GET WALLET BALANCE
-def get_wallet_balance(wallet_address, node = None):
+def get_wallet_balance(wallet_address):
     command = binary + ' query bank balances ' + wallet_address + ' --node ' + node + ' -o json'
     result = subprocess.run(command, shell=True, check=True, capture_output=True)
 

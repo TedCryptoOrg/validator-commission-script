@@ -10,8 +10,8 @@ and earn more with your rewards.
 You need to install some libraries before being able to run all the scripts
 
 ```shell
-sudo apt-get install pip python3 \
- && pip install -r requirements.txt
+sudo apt-get update && sudo apt-get install python3-pip python3 -y \
+ && pip3 install -r requirements.txt
 ```
 
 You need to copy and fill .env file
