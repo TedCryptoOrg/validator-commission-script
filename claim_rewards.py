@@ -2,7 +2,10 @@ import json
 import os
 import subprocess
 import time
+
+from subprocess import PIPE
 from dotenv import load_dotenv
+
 load_dotenv()
 
 # ENVIRONMENT SETTINGS
@@ -32,7 +35,7 @@ def get_mintscan_url(tx):
 # GET WALLET BALANCE
 def get_wallet_balance(wallet_address):
     command = binary + ' query bank balances ' + wallet_address + ' --node ' + node + ' -o json'
-    result = subprocess.run(command, shell=True, check=True, capture_output=True)
+    result = subprocess.run(command, shell=True, check=True, stdout=PIPE, stderr=PIPE)
 
     if result.returncode != 0:
         print("Error. Command: ", command)
@@ -49,7 +52,7 @@ def get_wallet_balance(wallet_address):
 
 # RUN COMMAND
 def run_command(command):
-    result = subprocess.run(command, shell=True, check=True, capture_output=True)
+    result = subprocess.run(command, shell=True, check=True, stdout=PIPE, stderr=PIPE)
     if result.returncode != 0:
         print("Error. Command: ", command)
         exit(1)
