@@ -63,19 +63,23 @@ def run_command(command):
         exit(1)
     stdout = result.stdout.decode('utf-8')
 
-    command_result = {}
+    inner_command_result = {}
     for line in stdout.splitlines():
-        command_result[line.split(':')[0].strip()] = line.split(':')[1].strip()
+        try:
+            inner_command_result[line.split(':')[0].strip()] = line.split(':')[1].strip()
+        except:
+            print('Stdout is not as expected. Different issue?', stdout, line)
+            exit(1)
 
-    if 'raw_log' not in command_result:
-        print("Error: Raw log not found", command, command_result)
+    if 'raw_log' not in inner_command_result:
+        print("Error: Raw log not found", command, inner_command_result)
         exit(1)
 
-    if command_result['raw_log'] != "'[]'":
-        print("Error: Raw log provided... ", command, command_result)
+    if inner_command_result['raw_log'] != "'[]'":
+        print("Error: Raw log provided... ", command, inner_command_result)
         exit(1)
 
-    return command_result
+    return inner_command_result
 
 
 # CLAIM REWARDS
@@ -157,18 +161,19 @@ if external_amount > 0.001:
     print('Your possible external amount is ' + str(external_amount) + denom)
 
 if (0.001 < restake_amount < restake_min_balance) or (0.001 < external_amount < external_min_balance):
-    print('Minimums are not. Min restake balance is set to ' + str(restake_min_balance) + ' and external min balance is set to ' + str(external_min_balance))
+    print('Minimums are not. Min restake balance is set to ' + str(restake_min_balance) +
+          ' and external min balance is set to ' + str(external_min_balance))
     exit(0)
 
 if restake_amount > 0.001:
     print('Staking ' + str(restake_amount) + denom + ' please wait...')
-    command_result = stake(restake_amount, 2500)
+    command_result = stake(restake_amount, 25000)
     print(get_mintscan_url(command_result['txhash']))
     time.sleep(10)
 
 if external_amount > 0.001:
     print('Sending ' + str(external_amount) + denom + ' to external wallet please wait...')
-    command_result = send_token(external_amount, 2500)
+    command_result = send_token(external_amount, 25000)
     print(get_mintscan_url(command_result['txhash']))
     time.sleep(10)
 
