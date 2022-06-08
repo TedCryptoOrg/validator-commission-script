@@ -24,6 +24,7 @@ KEYRING_PASSWORD -- Password to open keyring
 CHAIN_NAME -- Chain name (for mintscan purposes)
 CHAIN_ID -- Chain id 
 DENOM -- Denomination the `u` version e.g. utoken
+GAS_FEES -- The gas fees to be used as default on your commands
 NODE -- Can be public, one of your nodes or http://localhost:26657 if you are running locally
 RESTAKE_MIN_BALANCE -- Min balance you want to restake, to avoid paying high fees for small amounts (default: 10000)
 RESTAKE_WALLET_ADDRESS -- Usually your validator address (commission wallet)
