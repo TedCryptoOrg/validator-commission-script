@@ -120,6 +120,22 @@ def send_token(amount, gas_fees):
 
     return run_command(command)
 
+
+# Wait for changes on the wallet balance
+def wait_for_wallet_balance(wait_original_balance, wait_attempts):
+    wait_attempts_count = 0
+    wait_current_balance = get_wallet_balance(restake_wallet_address)
+    while wait_attempts_count < wait_attempts and wait_original_balance == wait_current_balance:
+        print('Validator balance was not updated... trying again in 10 seconds...')
+        time.sleep(10)
+        wait_current_balance = get_wallet_balance(restake_wallet_address)
+        wait_attempts_count += 1
+
+    if wait_original_balance == wait_current_balance:
+        print('Validator balance was not updated has expected')
+        exit(1)
+
+
 if __name__ == '__main__':
     original_validator_balance = get_wallet_balance(restake_wallet_address)
     print("Validator balance:" + str(original_validator_balance) + '\n\n')
@@ -165,10 +181,12 @@ if __name__ == '__main__':
         exit(0)
 
     if restake_amount > 0.001:
+        balance_before_restake = get_wallet_balance(restake_wallet_address)
         print('Staking ' + format(restake_amount, 'f') + denom + ' please wait...')
         command_result = stake(restake_amount, gas_fees)
         print(get_mintscan_url(command_result['txhash']))
         time.sleep(10)
+        wait_for_wallet_balance(balance_before_restake, 5)
 
     if external_amount > 0.001:
         print('Sending ' + format(external_amount, 'f') + denom + ' to external wallet please wait...')
