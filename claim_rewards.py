@@ -91,6 +91,7 @@ def claim_rewards(gas_fees):
               + ' --node ' + node \
               + ' --from ' + keyring_wallet_name \
               + ' --commission' \
+              + ' --gas auto' \
               + ' -y --fees ' + str(gas_fees) + denom
 
     return run_command(command)
@@ -103,6 +104,7 @@ def stake(stake_balance, gas_fees):
               + ' --chain-id ' + chain_id \
               + ' --node ' + node \
               + ' --from ' + keyring_wallet_name \
+              + ' --gas auto' \
               + ' -y --fees ' + format(gas_fees, 'f') + denom
 
     return run_command(command)
@@ -116,6 +118,7 @@ def send_token(amount, gas_fees):
               + ' --chain-id ' + chain_id \
               + ' --node ' + node \
               + ' --from ' + keyring_wallet_name \
+              + ' --gas auto' \
               + ' -y --fees ' + format(gas_fees, 'f') + denom
 
     return run_command(command)
@@ -138,7 +141,7 @@ def wait_for_wallet_balance(wait_original_balance, wait_attempts):
 
 if __name__ == '__main__':
     original_validator_balance = get_wallet_balance(restake_wallet_address)
-    print("Validator balance:" + str(original_validator_balance) + '\n\n')
+    print("Validator balance:" + format(original_validator_balance, 'f') + '\n\n')
 
     print(' -- Claim Rewards -- ')
     command_result = claim_rewards(gas_fees)
