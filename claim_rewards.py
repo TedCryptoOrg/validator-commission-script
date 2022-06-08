@@ -99,11 +99,11 @@ def claim_rewards(gas_fees):
 # STAKE FUNCTION
 def stake(stake_balance, gas_fees):
     command = 'echo -e "' + keyring_password + "\n" + keyring_password + '\n" | ' \
-              + binary + ' tx staking delegate ' + validator + ' ' + str(stake_balance) + denom \
+              + binary + ' tx staking delegate ' + validator + ' ' + format(stake_balance, 'f') + denom \
               + ' --chain-id ' + chain_id \
               + ' --node ' + node \
               + ' --from ' + keyring_wallet_name \
-              + ' -y --fees ' + str(gas_fees) + denom
+              + ' -y --fees ' + format(gas_fees, 'f') + denom
 
     return run_command(command)
 
@@ -112,11 +112,11 @@ def stake(stake_balance, gas_fees):
 def send_token(amount, gas_fees):
     command = 'echo -e "' + keyring_password + "\n" + keyring_password + '\n" | ' \
               + binary + ' tx bank send ' + restake_wallet_address + ' ' + external_wallet_address \
-              + ' ' + str(amount) + denom \
+              + ' ' + format(amount, 'f') + denom \
               + ' --chain-id ' + chain_id \
               + ' --node ' + node \
               + ' --from ' + keyring_wallet_name \
-              + ' -y --fees ' + str(gas_fees) + denom
+              + ' -y --fees ' + format(gas_fees, 'f') + denom
 
     return run_command(command)
 
@@ -152,26 +152,26 @@ if __name__ == '__main__':
     restake_amount = balance*restake_wallet_percentage/100
     external_amount = balance*external_wallet_percentage/100
 
-    print('Your workable (balance - 1token for fees) is ' + str(balance) + denom)
+    print('Your workable (balance - 1token for fees) is ' + format(balance, 'f') + denom)
 
     if restake_amount > 0.001:
-        print('You possible restake amount is ' + str(restake_amount) + denom)
+        print('You possible restake amount is ' + format(restake_amount, 'f') + denom)
     if external_amount > 0.001:
-        print('Your possible external amount is ' + str(external_amount) + denom)
+        print('Your possible external amount is ' + format(external_amount, 'f') + denom)
 
     if (0.001 < restake_amount < restake_min_balance) or (0.001 < external_amount < external_min_balance):
-        print('Minimums are not. Min restake balance is set to ' + str(restake_min_balance) +
-              ' and external min balance is set to ' + str(external_min_balance))
+        print('Minimums are not. Min restake balance is set to ' + format(restake_min_balance, 'f') +
+              ' and external min balance is set to ' + format(external_min_balance, 'f'))
         exit(0)
 
     if restake_amount > 0.001:
-        print('Staking ' + str(restake_amount) + denom + ' please wait...')
+        print('Staking ' + format(restake_amount, 'f') + denom + ' please wait...')
         command_result = stake(restake_amount, gas_fees)
         print(get_mintscan_url(command_result['txhash']))
         time.sleep(10)
 
     if external_amount > 0.001:
-        print('Sending ' + str(external_amount) + denom + ' to external wallet please wait...')
+        print('Sending ' + format(external_amount, 'f') + denom + ' to external wallet please wait...')
         command_result = send_token(external_amount, gas_fees)
         print(get_mintscan_url(command_result['txhash']))
         time.sleep(10)
