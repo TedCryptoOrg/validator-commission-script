@@ -125,7 +125,7 @@ if __name__ == '__main__':
     print("Validator balance:" + str(original_validator_balance) + '\n\n')
 
     print(' -- Claim Rewards -- ')
-    command_result = claim_rewards(2500)
+    command_result = claim_rewards(gas_fees)
     print('Claim requested...')
     print(get_mintscan_url(command_result['txhash']))
     print('Waiting for it to be accepted...')
@@ -166,13 +166,13 @@ if __name__ == '__main__':
 
     if restake_amount > 0.001:
         print('Staking ' + str(restake_amount) + denom + ' please wait...')
-        command_result = stake(restake_amount, 25000)
+        command_result = stake(restake_amount, gas_fees)
         print(get_mintscan_url(command_result['txhash']))
         time.sleep(10)
 
     if external_amount > 0.001:
         print('Sending ' + str(external_amount) + denom + ' to external wallet please wait...')
-        command_result = send_token(external_amount, 25000)
+        command_result = send_token(external_amount, gas_fees)
         print(get_mintscan_url(command_result['txhash']))
         time.sleep(10)
 
