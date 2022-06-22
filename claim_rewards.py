@@ -42,12 +42,12 @@ def get_mintscan_url(tx):
 def get_wallet_balance(wallet_address):
     command = binary + ' query bank balances ' + wallet_address + ' --node ' + node + ' -o json'
     result = subprocess.run(command, shell=True, check=True, stdout=PIPE, stderr=PIPE)
+    stdout = result.stdout.decode('utf-8')
 
     if result.returncode != 0:
-        print("Error. Command: ", command)
+        print("Error. Command: ", command, stdout)
         exit(1)
 
-    stdout = result.stdout.decode('utf-8')
     balance_object = json.loads(stdout)
     if 'balances' not in balance_object:
         print("Balance object is not as expected.", balance_object)
@@ -59,10 +59,10 @@ def get_wallet_balance(wallet_address):
 # RUN COMMAND
 def run_command(command):
     result = subprocess.run(command, shell=True, check=True, stdout=PIPE, stderr=PIPE)
-    if result.returncode != 0:
-        print("Error. Command: ", command)
-        exit(1)
     stdout = result.stdout.decode('utf-8')
+    if result.returncode != 0:
+        print("Error. Command: ", command, stdout)
+        exit(1)
 
     inner_command_result = {}
     for line in stdout.splitlines():
@@ -129,14 +129,16 @@ def wait_for_wallet_balance(wait_original_balance, wait_attempts):
     wait_attempts_count = 0
     wait_current_balance = get_wallet_balance(restake_wallet_address)
     while wait_attempts_count < wait_attempts and wait_original_balance == wait_current_balance:
-        print('Validator balance was not updated... trying again in 10 seconds...')
-        time.sleep(10)
+        print('Validator balance was not updated... trying again in 60 seconds...')
+        time.sleep(60)
         wait_current_balance = get_wallet_balance(restake_wallet_address)
         wait_attempts_count += 1
 
     if wait_original_balance == wait_current_balance:
         print('Validator balance was not updated has expected')
         exit(1)
+
+    return wait_current_balance
 
 
 if __name__ == '__main__':
@@ -149,19 +151,9 @@ if __name__ == '__main__':
     print(get_mintscan_url(command_result['txhash']))
     print('Waiting for it to be accepted...')
 
-    time.sleep(10)
+    time.sleep(60)
 
-    attempts = 0
-    balance = get_wallet_balance(restake_wallet_address)
-    while attempts < 3 and original_validator_balance == balance:
-        print('Validator balance was not updated... trying again in 10 seconds...')
-        time.sleep(10)
-        balance = get_wallet_balance(restake_wallet_address)
-        attempts += 1
-
-    if original_validator_balance == balance:
-        print('Validator balance was not updated. Commission probably wasn\'t accepted? Please check TX', command_result)
-        exit(1)
+    balance = wait_for_wallet_balance(original_validator_balance, 4)
 
     print(' -- Claim Successful -- \n')
 
@@ -188,13 +180,13 @@ if __name__ == '__main__':
         print('Staking ' + format(restake_amount, 'f') + denom + ' please wait...')
         command_result = stake(restake_amount, gas_fees)
         print(get_mintscan_url(command_result['txhash']))
-        time.sleep(10)
+        time.sleep(60)
         wait_for_wallet_balance(balance_before_restake, 5)
 
     if external_amount > 0.001:
         print('Sending ' + format(external_amount, 'f') + denom + ' to external wallet please wait...')
         command_result = send_token(external_amount, gas_fees)
         print(get_mintscan_url(command_result['txhash']))
-        time.sleep(10)
+        time.sleep(60)
 
     print(' -- Stake and Send Completed -- \n')
