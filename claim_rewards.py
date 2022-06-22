@@ -45,7 +45,7 @@ def get_wallet_balance(wallet_address):
     try:
         result = subprocess.run(command, shell=True, check=True, stdout=PIPE, stderr=PIPE)
     except subprocess.CalledProcessError as e:
-        print(e.output)
+        print("Error running command \n", command, "\n Output: \n", e.stderr.decode('utf-8'))
         exit(1)
     stdout = result.stdout.decode('utf-8')
 
@@ -67,7 +67,7 @@ def run_command(command):
     try:
         result = subprocess.run(command, shell=True, check=True, stdout=PIPE, stderr=PIPE)
     except subprocess.CalledProcessError as e:
-        print(e.output)
+        print("Error running command \n", command, "\n Output: \n", e.stderr.decode('utf-8'))
         exit(1)
     stdout = result.stdout.decode('utf-8')
     if result.returncode != 0:
