@@ -41,7 +41,12 @@ def get_mintscan_url(tx):
 # GET WALLET BALANCE
 def get_wallet_balance(wallet_address):
     command = binary + ' query bank balances ' + wallet_address + ' --node ' + node + ' -o json'
-    result = subprocess.run(command, shell=True, check=True, stdout=PIPE, stderr=PIPE)
+    result = None
+    try:
+        result = subprocess.run(command, shell=True, check=True, stdout=PIPE, stderr=PIPE)
+    except subprocess.CalledProcessError as e:
+        print(e.output)
+        exit(1)
     stdout = result.stdout.decode('utf-8')
 
     if result.returncode != 0:
@@ -58,7 +63,12 @@ def get_wallet_balance(wallet_address):
 
 # RUN COMMAND
 def run_command(command):
-    result = subprocess.run(command, shell=True, check=True, stdout=PIPE, stderr=PIPE)
+    result = None
+    try:
+        result = subprocess.run(command, shell=True, check=True, stdout=PIPE, stderr=PIPE)
+    except subprocess.CalledProcessError as e:
+        print(e.output)
+        exit(1)
     stdout = result.stdout.decode('utf-8')
     if result.returncode != 0:
         print("Error. Command: ", command, stdout)
