@@ -2,6 +2,7 @@ import json
 import os
 import subprocess
 import time
+import yaml
 
 from subprocess import PIPE
 from dotenv import load_dotenv
@@ -18,18 +19,24 @@ chain_id = os.environ.get('CHAIN_ID')
 denom = os.environ.get('DENOM')
 node = os.environ.get('NODE')
 gas_fees = float(os.environ.get('GAS_FEES'))
-restake_min_balance = float(os.environ.get('RESTAKE_MIN_BALANCE'))
-restake_wallet_address = os.environ.get('RESTAKE_WALLET_ADDRESS')
-restake_wallet_percentage = float(os.environ.get('RESTAKE_WALLET_PERCENTAGE'))
-external_min_balance = float(os.environ.get('EXTERNAL_MIN_BALANCE'))
-external_wallet_address = os.environ.get('EXTERNAL_WALLET_ADDRESS')
-external_wallet_percentage = float(os.environ.get('EXTERNAL_WALLET_PERCENTAGE'))
+validator_wallet_address = os.environ.get('VALIDATOR_WALLET_ADDRESS')
 
 print('===== Running script =======\n')
 
-total_percentage = restake_wallet_percentage + external_wallet_percentage
-if total_percentage > 100:
-    print('Restake and withdraw cannot be bigger than 100%!')
+with open("configuration.yaml", 'r') as stream:
+    configuration_data = yaml.safe_load(stream)
+
+# Make sure that the percentage between all tasks are 100% of the funds
+total_percentage = 0
+if 'stake' in configuration_data['tasks']:
+    for task in configuration_data['tasks']['stake']:
+        total_percentage += task['percentage']
+if 'payments' in configuration_data['tasks']:
+    for task in configuration_data['tasks']['payments']:
+        total_percentage += int(task['percentage'])
+
+if total_percentage != 100:
+    print('Percentages do not match. Total: ', total_percentage)
     exit(1)
 
 
@@ -108,9 +115,9 @@ def claim_rewards(gas_fees):
 
 
 # STAKE FUNCTION
-def stake(stake_balance, gas_fees):
+def stake(address, stake_balance, gas_fees):
     command = 'echo -e "' + keyring_password + "\n" + keyring_password + '\n" | ' \
-              + binary + ' tx staking delegate ' + validator + ' ' + format(stake_balance, 'f') + denom \
+              + binary + ' tx staking delegate ' + address + ' ' + format(stake_balance, 'f') + denom \
               + ' --chain-id ' + chain_id \
               + ' --node ' + node \
               + ' --from ' + keyring_wallet_name \
@@ -121,9 +128,9 @@ def stake(stake_balance, gas_fees):
 
 
 # Send tokens between wallets
-def send_token(amount, gas_fees):
+def send_token(address, amount, gas_fees):
     command = 'echo -e "' + keyring_password + "\n" + keyring_password + '\n" | ' \
-              + binary + ' tx bank send ' + restake_wallet_address + ' ' + external_wallet_address \
+              + binary + ' tx bank send ' + validator_wallet_address + ' ' + address \
               + ' ' + format(amount, 'f') + denom \
               + ' --chain-id ' + chain_id \
               + ' --node ' + node \
@@ -137,11 +144,11 @@ def send_token(amount, gas_fees):
 # Wait for changes on the wallet balance
 def wait_for_wallet_balance(wait_original_balance, wait_attempts):
     wait_attempts_count = 0
-    wait_current_balance = get_wallet_balance(restake_wallet_address)
+    wait_current_balance = get_wallet_balance(validator_wallet_address)
     while wait_attempts_count < wait_attempts and wait_original_balance == wait_current_balance:
         print('Validator balance was not updated... trying again in 60 seconds...')
-        time.sleep(60)
-        wait_current_balance = get_wallet_balance(restake_wallet_address)
+        time.sleep(10)
+        wait_current_balance = get_wallet_balance(validator_wallet_address)
         wait_attempts_count += 1
 
     if wait_original_balance == wait_current_balance:
@@ -152,7 +159,7 @@ def wait_for_wallet_balance(wait_original_balance, wait_attempts):
 
 
 if __name__ == '__main__':
-    original_validator_balance = get_wallet_balance(restake_wallet_address)
+    original_validator_balance = get_wallet_balance(validator_wallet_address)
     print("Validator balance:" + format(original_validator_balance, 'f') + '\n\n')
 
     print(' -- Claim Rewards -- ')
@@ -161,42 +168,46 @@ if __name__ == '__main__':
     print(get_mintscan_url(command_result['txhash']))
     print('Waiting for it to be accepted...')
 
-    time.sleep(60)
+    time.sleep(10)
 
     balance = wait_for_wallet_balance(original_validator_balance, 4)
 
     print(' -- Claim Successful -- \n')
 
-    print(' -- Stake and Send -- ')
+    print(' -- Running tasks -- ')
 
     balance -= 1000000
-    restake_amount = balance*restake_wallet_percentage/100
-    external_amount = balance*external_wallet_percentage/100
 
     print('Your workable (balance - 1token for fees) is ' + format(balance, 'f') + denom)
 
-    if restake_amount > 0.001:
-        print('You possible restake amount is ' + format(restake_amount, 'f') + denom)
-    if external_amount > 0.001:
-        print('Your possible external amount is ' + format(external_amount, 'f') + denom)
+    # Check if tasks have any stake that needs to be done
+    if 'stake' in configuration_data['tasks']:
+        for task in configuration_data['tasks']['stake']:
+            balance_before_task = get_wallet_balance(validator_wallet_address)
+            task_amount = balance * task['percentage'] / 100
+            print('Staking ' + format(task_amount, 'f') + denom + ' to validator ' + task['address'])
+            command_result = stake(task['address'], task_amount, gas_fees)
+            print('Stake requested...')
+            print(get_mintscan_url(command_result['txhash']))
+            print('Waiting for it to be accepted...')
 
-    if (0.001 < restake_amount < restake_min_balance) or (0.001 < external_amount < external_min_balance):
-        print('Minimums are not. Min restake balance is set to ' + format(restake_min_balance, 'f') +
-              ' and external min balance is set to ' + format(external_min_balance, 'f'))
-        exit(0)
+            time.sleep(10)
 
-    if restake_amount > 0.001:
-        balance_before_restake = get_wallet_balance(restake_wallet_address)
-        print('Staking ' + format(restake_amount, 'f') + denom + ' please wait...')
-        command_result = stake(restake_amount, gas_fees)
-        print(get_mintscan_url(command_result['txhash']))
-        time.sleep(60)
-        wait_for_wallet_balance(balance_before_restake, 5)
+            wait_for_wallet_balance(balance_before_task, 4)
 
-    if external_amount > 0.001:
-        print('Sending ' + format(external_amount, 'f') + denom + ' to external wallet please wait...')
-        command_result = send_token(external_amount, gas_fees)
-        print(get_mintscan_url(command_result['txhash']))
-        time.sleep(60)
+    # Check if tasks have any payment that needs to be sent
+    if 'payments' in configuration_data['tasks']:
+        for task in configuration_data['tasks']['payments']:
+            balance_before_task = get_wallet_balance(validator_wallet_address)
+            task_amount = balance * task['percentage'] / 100
+            print('Sending ' + format(task_amount, 'f') + denom + ' to ' + task['address'])
+            command_result = send_token(task['address'], task_amount, gas_fees)
+            print('Payment requested...')
+            print(get_mintscan_url(command_result['txhash']))
+            print('Waiting for it to be accepted...')
 
-    print(' -- Stake and Send Completed -- \n')
+            time.sleep(10)
+
+            wait_for_wallet_balance(balance_before_task, 4)
+
+    print(' -- Tasks Completed -- \n')

@@ -1,0 +1,9 @@
+tasks:
+  payments:
+   -
+     address: xxx
+     percentage: x
+  stake:
+   -
+     address: xxx
+     percentage: x
