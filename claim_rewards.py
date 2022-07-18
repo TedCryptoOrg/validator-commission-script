@@ -109,7 +109,7 @@ def claim_rewards(gas_fees):
               + ' --from ' + keyring_wallet_name \
               + ' --commission' \
               + ' --gas auto' \
-              + ' --gas-modifier=1.3' \
+              + ' --gas-adjustment=1.3' \
               + ' --broadcast-mode=sync' \
               + ' -y --fees ' + str(gas_fees) + denom
 
@@ -124,7 +124,7 @@ def stake(address, stake_balance, gas_fees):
               + ' --node ' + node \
               + ' --from ' + keyring_wallet_name \
               + ' --gas auto' \
-              + ' --gas-modifier=1.3' \
+              + ' --gas-adjustment=1.3' \
               + ' --broadcast-mode=sync' \
               + ' -y --fees ' + format(gas_fees, 'f') + denom
 
@@ -140,7 +140,7 @@ def send_token(address, amount, gas_fees):
               + ' --node ' + node \
               + ' --from ' + keyring_wallet_name \
               + ' --gas auto' \
-              + ' --gas-modifier=1.3' \
+              + ' --gas-adjustment=1.3' \
               + ' --broadcast-mode=sync' \
               + ' -y --fees ' + format(gas_fees, 'f') + denom
 
