@@ -20,6 +20,7 @@ denom = os.environ.get('DENOM')
 node = os.environ.get('NODE')
 gas_fees = float(os.environ.get('GAS_FEES'))
 validator_wallet_address = os.environ.get('VALIDATOR_WALLET_ADDRESS')
+keep_balance = float(os.environ.get('KEEP_BALANCE'))
 
 print('===== Running script =======\n')
 
@@ -182,7 +183,7 @@ if __name__ == '__main__':
 
     print(' -- Running tasks -- ')
 
-    balance -= 1000000
+    balance -= keep_balance
 
     print('Your workable (balance - 1token for fees) is ' + format(balance, 'f') + denom)
 

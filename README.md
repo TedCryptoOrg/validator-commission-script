@@ -26,16 +26,21 @@ CHAIN_ID -- Chain id
 DENOM -- Denomination the `u` version e.g. utoken
 GAS_FEES -- The gas fees to be used as default on your commands
 NODE -- Can be public, one of your nodes or http://localhost:26657 if you are running locally
-RESTAKE_MIN_BALANCE -- Min balance you want to restake, to avoid paying high fees for small amounts (default: 10000)
-RESTAKE_WALLET_ADDRESS -- Usually your validator address (commission wallet)
-RESTAKE_WALLET_PERCENTAGE -- Percentage of commission you want to restake (0 - 100)
-EXTERNAL_MIN_BALANCE -- Min balance you want to move out (default: 10000)
-EXTERNAL_WALLET_ADDRESS -- External wallet, can be one you delegate outside your node
-EXTERNAL_WALLET_PERCENTAGE -- Percentage of comission you want to move out (0 - 100)
+VALIDATOR_WALLET_ADDRESS -- Validator wallet address
+KEEP_BALANCE -- Amount of tokens you want to keep to pay for TXs and such
 ```
 
-Special conditions:
- - If the min balance is not met for restake or external move then no stake and external will be done
+## Configuration
+
+You will need to also configure your tasks, e.g.: stake and payments
+
+Copy the `configuration.yaml.dist` to `configuration.yaml`
+
+You can configure `payments` and `stake` you can stake to multiple
+validators and you can send/pay to multiple wallets. As of now
+it only works with percentages and the sum of those percentages need to 
+be equal to `100%`
+
 
 ## Example of script working
 
