@@ -21,6 +21,8 @@ node = os.environ.get('NODE')
 gas_fees = float(os.environ.get('GAS_FEES'))
 validator_wallet_address = os.environ.get('VALIDATOR_WALLET_ADDRESS')
 keep_balance = float(os.environ.get('KEEP_BALANCE'))
+gas = float(os.environ.get('GAS'))
+gas_adjustment = float(os.environ.get('GAS_ADJUSTMENT'))
 
 print('===== Running script =======\n')
 
@@ -109,8 +111,8 @@ def claim_rewards(gas_fees):
               + ' --node ' + node \
               + ' --from ' + keyring_wallet_name \
               + ' --commission' \
-              + ' --gas auto' \
-              + ' --gas-adjustment=1.3' \
+              + ' --gas ' + gas \
+              + ' --gas-adjustment=' + gas_adjustment \
               + ' --broadcast-mode=sync' \
               + ' -y --fees ' + format(gas_fees, 'f') + denom
 
@@ -124,8 +126,8 @@ def stake(address, stake_balance, gas_fees):
               + ' --chain-id ' + chain_id \
               + ' --node ' + node \
               + ' --from ' + keyring_wallet_name \
-              + ' --gas auto' \
-              + ' --gas-adjustment=1.3' \
+              + ' --gas ' + gas \
+              + ' --gas-adjustment=' + gas_adjustment \
               + ' --broadcast-mode=sync' \
               + ' -y --fees ' + format(gas_fees, 'f') + denom
 
@@ -140,8 +142,8 @@ def send_token(address, amount, gas_fees):
               + ' --chain-id ' + chain_id \
               + ' --node ' + node \
               + ' --from ' + keyring_wallet_name \
-              + ' --gas auto' \
-              + ' --gas-adjustment=1.3' \
+              + ' --gas ' + gas \
+              + ' --gas-adjustment=' + gas_adjustment \
               + ' --broadcast-mode=sync' \
               + ' -y --fees ' + format(gas_fees, 'f') + denom
 
