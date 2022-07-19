@@ -112,7 +112,7 @@ def claim_rewards(gas_fees):
               + ' --gas auto' \
               + ' --gas-adjustment=1.3' \
               + ' --broadcast-mode=sync' \
-              + ' -y --fees ' + str(gas_fees) + denom
+              + ' -y --fees ' + format(gas_fees, 'f') + denom
 
     return run_command(command)
 
