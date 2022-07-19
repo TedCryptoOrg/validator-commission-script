@@ -21,8 +21,8 @@ node = os.environ.get('NODE')
 gas_fees = float(os.environ.get('GAS_FEES'))
 validator_wallet_address = os.environ.get('VALIDATOR_WALLET_ADDRESS')
 keep_balance = float(os.environ.get('KEEP_BALANCE'))
-gas = float(os.environ.get('GAS'))
-gas_adjustment = float(os.environ.get('GAS_ADJUSTMENT'))
+gas = os.environ.get('GAS')
+gas_adjustment = os.environ.get('GAS_ADJUSTMENT')
 
 print('===== Running script =======\n')
 
