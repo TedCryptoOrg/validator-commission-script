@@ -24,9 +24,11 @@ keep_balance = float(os.environ.get('KEEP_BALANCE'))
 gas = os.environ.get('GAS')
 gas_adjustment = os.environ.get('GAS_ADJUSTMENT')
 
+__location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
+
 print('===== Running script =======\n')
 
-with open("configuration.yaml", 'r') as stream:
+with open(os.path.join(__location__, "configuration.yaml"), 'r') as stream:
     configuration_data = yaml.safe_load(stream)
 
 # Make sure that the percentage between all tasks are 100% of the funds
